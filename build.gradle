@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id "io.qameta.allure" version "2.11.2"
+}
+
+repositories {
+    mavenCentral()
+}
+
+allure {
+    version = '2.33.0'
+    adapter {
+        frameworks {
+            junit5 {
+                enabled = true
+            }
+        }
+    }
+}
+
+dependencies {
+    testImplementation 'com.microsoft.playwright:playwright:1.56.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'io.qameta.allure:allure-junit5:2.33.0'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
