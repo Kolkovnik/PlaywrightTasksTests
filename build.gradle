@@ -24,9 +24,11 @@ dependencies {
     testImplementation 'io.qameta.allure:allure-junit5:2.33.0'
 }
 
+//tasks.withType(JavaCompile).configureEach {
+//    options.encoding = 'UTF-8'
+//}
+
 test {
     useJUnitPlatform()
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
+    systemProperty "file.encoding", "UTF-8"
 }

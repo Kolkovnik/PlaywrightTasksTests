@@ -23,12 +23,10 @@ public class PlaywrightTasksTests extends BaseTest {
     @Owner("Kolkov")
     @Tag("smoke")
     @DisplayName("Возможность нажатия на кнопку с динамическим 'id'")
-    // Если из TestOps, то название метода было по типу 'public void tc_12345()'
+    // Если из TestOps, то название метода было бы по типу 'public void tc_12345()'
     public void dynamicIdTest() {
         page.navigate("http://uitestingplayground.com/dynamicid");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Button with Dynamic ID")).click();
-        // ИЛИ
-        // page.locator("xpath=//button[@class='btn btn-primary']").click();
     }
 
     @AllureId("002")
@@ -62,7 +60,8 @@ public class PlaywrightTasksTests extends BaseTest {
             greenButton.click(new Locator.ClickOptions().setTrial(true).setTimeout(1000));
             fail("Кнопка почему-то нажалась :(");
         } catch (TimeoutError e) {
-            System.out.println("Кнопку нельзя нажать. Ура!\nСкрин перекрывающей кнопки в папке 'screenshot/overlayButton.png'");
+            System.out.println(
+                    "Кнопку нельзя нажать. Ура!\nСкрин перекрывающей кнопки в папке 'screenshot/overlayButton.png'");
             page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("screenshot/overlayButton.png")));
         }
     }
@@ -75,7 +74,8 @@ public class PlaywrightTasksTests extends BaseTest {
     public void loadDelayTest() {
         page.navigate("http://uitestingplayground.com");
         page.getByText("Load Delay").click();
-        Locator delayButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Button Appearing After Delay"));
+        Locator delayButton = page.getByRole(AriaRole.BUTTON,
+                new Page.GetByRoleOptions().setName("Button Appearing After Delay"));
 
         assertThat(delayButton).isEnabled();
         delayButton.click();
@@ -102,7 +102,8 @@ public class PlaywrightTasksTests extends BaseTest {
     @DisplayName("Возможность ожидания загрузки элемента на странице со стороны клиента")
     public void clientSideDelayTest() {
         page.navigate("http://uitestingplayground.com/clientdelay");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Button Triggering Client Side Logic")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Button Triggering Client Side Logic"))
+                .click();
         Locator requiredText = page.getByText("Data calculated on the client side.");
         requiredText.click();
 
@@ -129,7 +130,8 @@ public class PlaywrightTasksTests extends BaseTest {
     public void textInputTest() {
         page.navigate("http://uitestingplayground.com/textinput");
         page.locator("input[class='form-control']").fill("testButton");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Button That Should Change it's Name Based on Input Value")).click();
+        page.getByRole(AriaRole.BUTTON,
+                        new Page.GetByRoleOptions().setName("Button That Should Change it's Name Based on Input Value")).click();
 
         assertThat(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("testButton"))).isVisible();
     }
@@ -138,7 +140,7 @@ public class PlaywrightTasksTests extends BaseTest {
     @Test
     @Owner("Kolkov")
     @Tag("smoke")
-    @DisplayName("Возможность скролла до отображение элемента")
+    @DisplayName("Возможность скролла до отображения элемента")
     public void scrollbarsTest() {
         page.navigate("http://uitestingplayground.com/scrollbars");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Hiding Button")).click();
@@ -184,11 +186,11 @@ public class PlaywrightTasksTests extends BaseTest {
         Locator progressBar = page.locator("#progressBar");
         assertThat(progressBar).hasText(
                 Pattern.compile("(7[5-9]|[8-9][0-9])%"),
-                new LocatorAssertions.HasTextOptions().setTimeout(30000)
-        );
+                new LocatorAssertions.HasTextOptions().setTimeout(30000));
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Stop")).click();
 
-        System.out.println("Разница в секундах между нажатием кнопки и значением '75%' = " + page.locator("#result").innerText());
+        System.out.println(
+                "Разница в секундах между нажатием кнопки и значением '75%' = " + page.locator("#result").innerText());
     }
 
     @AllureId("013")
@@ -209,5 +211,250 @@ public class PlaywrightTasksTests extends BaseTest {
                 System.out.println("Кнопка '" + buttonText + "' отображается в DOM");
             }
         }
+    }
+
+    @AllureId("014")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность заполнения формы логирования")
+    public void sampleAppTest() {
+        page.navigate("http://uitestingplayground.com/sampleapp");
+        String userName = "testUser";
+        page.locator("//input[@type='text']").fill(userName);
+        page.locator("//input[@type='password']").fill("pwd");
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Log In")).click();
+
+        assertThat(page.locator("#loginstatus")).containsText(userName);
+    }
+
+    @AllureId("015")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность нажатия на элемент при изменении этого элемента в DOM при наведении курсора")
+    public void mouseOverTest() {
+        page.navigate("http://uitestingplayground.com/mouseover");
+        page.locator("xpath=//a[contains(text(), 'Click me')]").click();
+        page.getByText("Link Button").click();
+
+        assertThat(page.locator("//span[@id='clickCount']")).hasText("1");
+        assertThat(page.locator("//span[@id='clickButtonCount']")).hasText("1");
+    }
+
+    @AllureId("016")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность поиска локатора со скрытыми символами")
+    public void nonBreakingSpaceTest() {
+        page.navigate("http://uitestingplayground.com/nbsp");
+        Locator myButton = page.locator("xpath=//button[text()='My\u00A0Button']");
+        myButton.click();
+        /* Эти способы не прокатили:
+        page.locator("xpath=//button[text()='My' + '&nbsp;' + 'Button']").click();
+        page.GetByRoleOptions().setName("My&#160Button")).click();
+        page.locator("xpath=//button[text()='My&nbsp;Button']").click();*/
+        assertThat(myButton).isVisible();
+    }
+
+    @AllureId("017")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность взаимодействия с перекрытым элементом")
+    public void overlappedElementTest() {
+        page.navigate("http://uitestingplayground.com/overlapped");
+        Locator nameField = page.locator("#name");
+        nameField.click();
+        nameField.fill("Nikita");
+    }
+
+    @AllureId("018")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность взаимодействия с элементом в shadow DOM")
+    public void shadowDomTest() {
+        page.navigate("http://uitestingplayground.com/shadowdom");
+
+        page.locator("#buttonGenerate").click();
+        page.locator("#buttonCopy").click(); // Кнопка не работает, поэтому тест не полный :(
+
+        String actualText = page.locator("#editField").inputValue();
+
+        assertThat(page.locator("#editField")).hasValue(actualText); // Просто чтобы была проверка :)
+    }
+
+    @AllureId("019")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Взаимодействие со всплывающими окнами")
+    public void alertsTest() {
+        page.navigate("http://uitestingplayground.com/alerts");
+        page.onceDialog(dialog -> {
+            System.out.println("Сообщение во всплывающем окне (Alert): " + dialog.message());
+            dialog.accept();
+        });
+        page.locator("#alertButton").click();
+        page.onceDialog(dialog -> {
+            System.out.println("Сообщение во всплывающем окне (Confirm): " + dialog.message());
+            dialog.accept();
+        });
+        page.locator("#confirmButton").click();
+        page.onceDialog(dialog -> {
+            System.out.println("Сообщение во всплывающем окне (Promt) и ввод своего текста: " + dialog.message());
+            dialog.accept("asd");
+        });
+        page.locator("#promptButton").click();
+    }
+
+    @AllureId("020")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность загрузки файла через кнопку")
+    @Description("Загрузка файла через перетаскивание пока не возможна. Получится только через преобразование файла в массив байтов...")
+    public void fileUploadTest() {
+        page.navigate("http://uitestingplayground.com/upload");
+        // Загрузка файла через кнопку
+        page.locator("iframe").contentFrame().getByText("Browse files").setInputFiles(Paths.get("screenshot/overlayButton.png"));
+        assertThat(page.locator("iframe").contentFrame().getByText("overlayButton.png")).isVisible();
+    }
+
+    @AllureId("021")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Взаимодействие с движущимся элементом")
+    public void animatedButtonTest() {
+        page.navigate("http://uitestingplayground.com/animation");
+        page.locator("#animationButton").click();
+        page.locator("//button[@class = 'btn btn-primary']").click();
+
+        assertThat(page.locator("#opstatus")).hasText("Moving Target clicked. It's class name is 'btn btn-primary'");
+    }
+
+    @AllureId("022")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность ввода текста в поле после ожидания доступности")
+    public void disabledInputTest() {
+        page.navigate("http://uitestingplayground.com/disabledinput");
+        page.locator("#enableButton").click();
+        String actualText = "Hello!";
+        page.locator("#inputField").fill(actualText);
+        page.locator("#inputField").press("Enter");
+
+        assertThat(page.locator("#opstatus")).containsText(actualText);
+    }
+
+    @AllureId("023")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность взаимодействия с чекбоксами, выпадающим списком")
+    public void autoWaitTest() {
+        page.navigate("http://uitestingplayground.com/autowait");
+        Locator target = page.locator("#target");
+        Locator applyThreeSecond = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Apply 3s"));
+        Locator elementType = page.getByLabel("Choose an element type:");
+        Locator opStatus = page.locator("#opstatus");
+
+        // Чекбокс 'Visible' и элемент 'Button'
+        page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName("Visible")).uncheck();
+        applyThreeSecond.click();
+        assertThat(target).isHidden();
+
+        // Чекбокс 'Enabled' и элемент 'Textarea'
+        elementType.selectOption("Textarea");
+        page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName("Enabled")).uncheck();
+        applyThreeSecond.click();
+        target.fill("test");
+        elementType.click();
+        assertThat(opStatus).hasText("Text: test");
+
+        // Чекбокс 'Editable' и элемент 'input'
+        elementType.selectOption("input");
+        page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName("Editable")).uncheck();
+        applyThreeSecond.click();
+        target.fill("test");
+        target.press("Enter");
+        assertThat(opStatus).hasText("Text: test");
+
+        // Чекбокс 'On Top' и элемент 'Select'
+        elementType.selectOption("Select");
+        page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName("On Top")).uncheck();
+        applyThreeSecond.click();
+        target.selectOption("Item 2");
+        assertThat(opStatus).hasText("Selected: Item 2");
+
+        // Чекбокс 'Non Zero Size' и элемент 'Label'
+        elementType.selectOption("Label");
+        page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName("Non Zero Size")).uncheck();
+        applyThreeSecond.click();
+        assertThat(target).hasText("This is a Label");
+    }
+
+    @AllureId("024")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность работы с разными фреймами")
+    public void framesTest() {
+        page.navigate("http://uitestingplayground.com/frames");
+        // Внутренний фрейм
+        FrameLocator outerFrame = page.frameLocator("iframe[name='frame-outer']");
+        Locator outerResult = outerFrame.locator("#result");
+        // Кнопка "Edit"
+        outerFrame.locator("[data-action='edit']").click();
+        assertThat(outerResult).hasText("Button pressed: Edit");
+        // Кнопка "Submit"
+        outerFrame.getByText("Submit").click();
+        assertThat(outerResult).hasText("Button pressed: Submit");
+        // Кнопка "Click me"
+        outerFrame.locator("button[name='my-button']").click();
+        assertThat(outerResult).hasText("Button pressed: Click me");
+        // Кнопка "Primary"
+        outerFrame.locator("xpath=//button[@class='btn-class']").click();
+        assertThat(outerResult).hasText("Button pressed: Primary");
+
+        // Внешний фрейм
+        FrameLocator innerFrame = outerFrame.frameLocator("iframe[name='frame-inner']");
+        Locator innerResult = innerFrame.locator("#result");
+        // Кнопка "Edit"
+        innerFrame.locator("[data-action='edit']").click();
+        assertThat(innerResult).hasText("Button pressed: Edit");
+        // Кнопка "Submit"
+        innerFrame.getByText("Submit").click();
+        assertThat(innerResult).hasText("Button pressed: Submit");
+        // Кнопка "Click me"
+        innerFrame.locator("button[name='my-button']").click();
+        assertThat(innerResult).hasText("Button pressed: Click me");
+        // Кнопка "Primary"
+        innerFrame.locator("xpath=//button[@class='btn-class']").click();
+        assertThat(innerResult).hasText("Button pressed: Primary");
+    }
+
+    @AllureId("025")
+    @Test
+    @Owner("Kolkov")
+    @Tag("smoke")
+    @DisplayName("Возможность работы с геолокацией")
+    @Description("Геолокация не работает на сайте, поэтому проверяем только отклонение доступа к геолокации")
+    public void geoLocationTest() {
+/*        BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+                .setGeolocation(55.788556, 37.359521)
+                .setPermissions(Arrays.asList("geolocation")));
+        Page page = context.newPage();*/
+
+        page.navigate("http://uitestingplayground.com/geolocation");
+        page.locator("#requestLocation").click();
+        assertThat(page.locator("#location")).hasText("unavailable");
+
+//        assertThat(page.locator("#lat")).hasText("55.788556");
+//        assertThat(page.locator("#long")).hasText("37.359521");
     }
 }
