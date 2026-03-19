@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 
 ### IntelliJ IDEA ###
+.idea
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -16,6 +17,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+!allure-results
 ### Eclipse ###
 .apt_generated
 .classpath

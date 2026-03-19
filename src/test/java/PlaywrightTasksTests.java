@@ -4,6 +4,7 @@ import com.microsoft.playwright.options.AriaRole;
 import io.qameta.allure.AllureId;
 import io.qameta.allure.Description;
 import io.qameta.allure.Owner;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PlaywrightTasksTests extends BaseTest {
 
@@ -26,7 +26,10 @@ public class PlaywrightTasksTests extends BaseTest {
     // Если из TestOps, то название метода было бы по типу 'public void tc_12345()'
     public void dynamicIdTest() {
         page.navigate("http://uitestingplayground.com/dynamicid");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Button with Dynamic ID")).click();
+        Locator dynamicIdButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Button with Dynamic ID"));
+        dynamicIdButton.click();
+
+        assertThat(dynamicIdButton).isVisible();
     }
 
     @AllureId("002")
@@ -64,6 +67,7 @@ public class PlaywrightTasksTests extends BaseTest {
                     "Кнопку нельзя нажать. Ура!\nСкрин перекрывающей кнопки в папке 'screenshot/overlayButton.png'");
             page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("screenshot/overlayButton.png")));
         }
+        assertThat(page.locator("//button[@class='btn btn-primary']")).isVisible();
     }
 
     @AllureId("004")
@@ -76,9 +80,9 @@ public class PlaywrightTasksTests extends BaseTest {
         page.getByText("Load Delay").click();
         Locator delayButton = page.getByRole(AriaRole.BUTTON,
                 new Page.GetByRoleOptions().setName("Button Appearing After Delay"));
+        delayButton.click();
 
         assertThat(delayButton).isEnabled();
-        delayButton.click();
     }
 
     @AllureId("005")
@@ -131,9 +135,9 @@ public class PlaywrightTasksTests extends BaseTest {
         page.navigate("http://uitestingplayground.com/textinput");
         page.locator("input[class='form-control']").fill("testButton");
         page.getByRole(AriaRole.BUTTON,
-                        new Page.GetByRoleOptions().setName("Button That Should Change it's Name Based on Input Value")).click();
+                new Page.GetByRoleOptions().setName("Button That Should Change it's Name Based on Input Value")).click();
 
-        assertThat(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("testButton"))).isVisible();
+        assertThat(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("testButton"))).hasText("testButton");
     }
 
     @AllureId("009")
@@ -143,7 +147,10 @@ public class PlaywrightTasksTests extends BaseTest {
     @DisplayName("Возможность скролла до отображения элемента")
     public void scrollbarsTest() {
         page.navigate("http://uitestingplayground.com/scrollbars");
-        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Hiding Button")).click();
+        Locator hidingButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Hiding Button"));
+        hidingButton.click();
+
+        assertThat(hidingButton).isInViewport();
     }
 
     @AllureId("010")
@@ -179,7 +186,7 @@ public class PlaywrightTasksTests extends BaseTest {
     @Test
     @Owner("Kolkov")
     @Tag("smoke")
-    @DisplayName("Возможность взаимодействия с элементом с меняющимся значением")
+    @DisplayName("Возможность взаимодействия с элементом с меняющимся значением (полоса загрузки)")
     public void progressBarTest() {
         page.navigate("http://uitestingplayground.com/progressbar");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Start")).click();
@@ -200,17 +207,39 @@ public class PlaywrightTasksTests extends BaseTest {
     @DisplayName("Отображение скрытых кнопок на странице")
     public void visibilityButtonsTest() {
         page.navigate("http://uitestingplayground.com/visibility");
-        Locator allButtons = page.locator("button:not(#hideButton)");
-        List<Locator> buttonsList = allButtons.all();
+        Locator hideButton = page.locator("#hideButton");
+        Locator removedButton = page.locator("#removedButton");
+        Locator zeroWidthButton = page.locator("#zeroWidthButton");
+        Locator overlappedButton = page.locator("#overlappedButton");
+        Locator zeroOpacityButton = page.locator("#transparentButton");
+        Locator visibilityHiddenButton = page.locator("#invisibleButton");
+        Locator displayNoneButton = page.locator("#notdisplayedButton");
+        Locator offscreenButton = page.locator("#offscreenButton");
+
+        hideButton.click();
+
+        assertThat(hideButton).isVisible();
+        assertThat(removedButton).isHidden();
+        assertThat(zeroWidthButton).isHidden();
+        assertThat(overlappedButton).isVisible();
+        assertThat(zeroOpacityButton).isVisible();
+        assertThat(visibilityHiddenButton).isHidden();
+        assertThat(displayNoneButton).isHidden();
+        assertThat(offscreenButton).isVisible();
+
+        // ИЛИ так:
+         /*page.navigate("http://uitestingplayground.com/visibility");
+         Locator allButtons = page.locator("button:not(#hideButton)");
+         List<Locator> buttonsList = allButtons.all();
         page.locator("#hideButton").click();
-        for (Locator button : buttonsList) {
+         for (Locator button : buttonsList) {
             if (button.isHidden()) {
                 System.out.println("Кнопка скрыта/удалена, идём к следующей...");
             } else {
                 String buttonText = button.innerText();
                 System.out.println("Кнопка '" + buttonText + "' отображается в DOM");
             }
-        }
+        }*/
     }
 
     @AllureId("014")
@@ -270,6 +299,7 @@ public class PlaywrightTasksTests extends BaseTest {
         nameField.fill("Nikita");
     }
 
+    @Disabled("На сайте не работает кнопка копирования")
     @AllureId("018")
     @Test
     @Owner("Kolkov")
@@ -279,7 +309,7 @@ public class PlaywrightTasksTests extends BaseTest {
         page.navigate("http://uitestingplayground.com/shadowdom");
 
         page.locator("#buttonGenerate").click();
-        page.locator("#buttonCopy").click(); // Кнопка не работает, поэтому тест не полный :(
+        page.locator("#buttonCopy").click(); // Кнопка на сайте не работает, поэтому тест не точный :(
 
         String actualText = page.locator("#editField").inputValue();
 
@@ -320,6 +350,7 @@ public class PlaywrightTasksTests extends BaseTest {
         page.navigate("http://uitestingplayground.com/upload");
         // Загрузка файла через кнопку
         page.locator("iframe").contentFrame().getByText("Browse files").setInputFiles(Paths.get("screenshot/overlayButton.png"));
+
         assertThat(page.locator("iframe").contentFrame().getByText("overlayButton.png")).isVisible();
     }
 
@@ -376,7 +407,7 @@ public class PlaywrightTasksTests extends BaseTest {
         elementType.click();
         assertThat(opStatus).hasText("Text: test");
 
-        // Чекбокс 'Editable' и элемент 'input'
+        // Чекбокс 'Editable' и элемент 'Input'
         elementType.selectOption("input");
         page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName("Editable")).uncheck();
         applyThreeSecond.click();
