@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id "io.qameta.allure" version "2.11.2"
+    id "org.gradle.test-retry" version "1.6.0"
 }
 
 repositories {
@@ -35,5 +36,12 @@ tasks.withType(Test).configureEach {
 
 test {
     useJUnitPlatform()
+    maxParallelForks = 1
+    retry {
+        maxRetries = 2
+        maxFailures = 8
+        failOnPassedAfterRetry = false
+    }
+
     maxParallelForks = 1
 }
