@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PlaywrightTasksTests extends BaseTest {
+public class PlaywrightTasksTests extends BaseUITest {
 
     @AllureId("001")
     @Test

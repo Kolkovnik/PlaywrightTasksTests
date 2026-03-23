@@ -1,6 +1,8 @@
 # Playwright Tasks Tests
 
-Тренировочный проект автоматизации тестирования, покрывающий 24/25 сценариев взаимодействия с Playwright на тренировочном стенде [UI Testing Playground](http://uitestingplayground.com).
+Тренировочный проект автоматизации тестирования, покрывающий: 
+- 24/25 сценариев взаимодействия с Playwright на тренировочном стенде [UI Testing Playground](http://uitestingplayground.com).
+- Базовые запросы API для тренировочного стенда [Restful-booker.herokuapp.com](https://restful-booker.herokuapp.com/). Документация [API](https://restful-booker.herokuapp.com/apidoc/index.html).
 
 ## Особенности проекта:
 

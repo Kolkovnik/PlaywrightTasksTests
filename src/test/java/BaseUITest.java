@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-public class BaseTest {
+public class BaseUITest {
     protected Playwright playwright;
     protected Browser browser;
     protected BrowserContext context;
@@ -39,9 +39,6 @@ public class BaseTest {
             } catch (IOException e) {
                 System.err.println("Трассировка не подцепилась к Allure: " + e.getMessage());
             }
-
-//            context.tracing().stop(new Tracing.StopOptions()
-//                    .setPath(Paths.get("build/traces/trace-" + testInfo.getDisplayName() + ".zip")));
             context.close();
         }
         if (browser != null) browser.close();
