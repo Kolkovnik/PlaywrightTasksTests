@@ -1,4 +1,6 @@
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.assertions.PlaywrightAssertions;
+import com.microsoft.playwright.options.AriaRole;
 import io.qameta.allure.Allure;
 import org.junit.jupiter.api.*;
 
@@ -26,6 +28,7 @@ public class BaseUITest {
                 .setScreenshots(true)
                 .setSnapshots(true)
                 .setSources(true));
+        PlaywrightAssertions.setDefaultAssertionTimeout(10000);
     }
 
     @AfterEach
@@ -43,5 +46,51 @@ public class BaseUITest {
         }
         if (browser != null) browser.close();
         if (playwright != null) playwright.close();
+    }
+
+    /**
+     * Открыть страницу по URL
+     */
+    protected void open(String url) {
+        page.navigate(url);
+    }
+
+    /**
+     * Клик по кнопке через роль
+     */
+    protected void clickButton(String name) {
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName(name)).click();
+    }
+
+    /**
+     * Универсальный клик
+     */
+    protected void click(String selector) {
+        page.locator(selector).click();
+    }
+
+    /**
+     * Заполнить поле текстом
+     */
+    protected void fill(String selector, String text) {
+        page.locator(selector).fill(text);
+    }
+
+    /**
+     * Выбрать в выпадающем списке
+     */
+    protected void select(String selector, String value) {
+        page.locator(selector).selectOption(value);
+    }
+
+    /**
+     * Состояния чекбокса
+     */
+    protected void setCheckbox(String label, boolean status) {
+        if (status) {
+            page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName(label)).check();
+        } else {
+            page.getByRole(AriaRole.CHECKBOX, new Page.GetByRoleOptions().setName(label)).uncheck();
+        }
     }
 }
